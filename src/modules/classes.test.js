@@ -1,4 +1,4 @@
-import { Ship, Gameboard } from './classes';
+import { Ship, Gameboard, Player } from './classes';
 
 test('Ship stores hit locations', () => {
   const mockShip = new Ship(4);
@@ -15,13 +15,13 @@ test("Ship reports that it's been sunk", () => {
   expect(mockShip.sunk).toEqual(true);
 });
 
-test("Gameboard adds new ship and stores it so that board's array item is equal to ship's index", () => {
+test('Gameboard adds new ship and stores it properly', () => {
   const gameboard = new Gameboard();
   gameboard.init();
-  gameboard.addShip([0, 1, 2], 3);
-  gameboard.addShip([3, 4, 5, 6], 4);
+  gameboard.addShip([2, 3, 4], 3);
   gameboard.addShip([10, 15], 2);
-  expect(gameboard.board[10]).toEqual(2);
+  gameboard.addShip([20, 25], 2);
+  expect(gameboard.board[10].id).toEqual(1);
 });
 
 test('Gameboard receives attack and properly reports it', () => {
@@ -29,8 +29,7 @@ test('Gameboard receives attack and properly reports it', () => {
   gameboard.init();
   gameboard.addShip([3, 4, 5, 6], 4);
   gameboard.receiveAttack(5);
-  expect(gameboard.ships[0].hits[2]).toEqual('hit');
-  expect(gameboard.ships[0].hits[(0, 1, 3)]).toEqual(null);
+  expect(gameboard.ships[0].hits).toMatchObject([null, null, 'hit', null]);
 });
 
 test('Gameboard stores a missed attack', () => {
@@ -38,8 +37,7 @@ test('Gameboard stores a missed attack', () => {
   gameboard.init();
   gameboard.addShip([10, 15], 2);
   gameboard.receiveAttack(5);
-  expect(gameboard.board[10]).toEqual(0);
-  expect(gameboard.board[5]).toEqual('missed');
+  expect(gameboard.board[5].isMissed).toEqual(true);
 });
 
 test('Gameboard reports all ships have been sunk', () => {
@@ -53,4 +51,18 @@ test('Gameboard reports all ships have been sunk', () => {
   gameboard.receiveAttack(2);
   gameboard.receiveAttack(3);
   expect(gameboard.reportAllSunk()).toEqual(true);
+});
+
+test('Player makes a random movie', () => {
+  const gameboard = new Gameboard();
+  const player = new Player();
+  gameboard.init();
+  player.randomAttack(gameboard);
+  expect(gameboard.board).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        isMissed: true,
+      }),
+    ])
+  );
 });

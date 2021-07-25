@@ -4,12 +4,12 @@ class Ship {
     this.hits = Array(length).fill(null);
     this.sunk = false;
   }
-  hit(hitLocation) {
-    this.hits[hitLocation] = 'hit';
+  hit(part) {
+    this.hits[part] = 'hit';
     this.isSunk();
   }
   isSunk() {
-    if (this.hits.every((location) => location === 'hit')) this.sunk = true;
+    if (this.hits.length === this.length) this.sunk = true;
   }
 }
 
@@ -23,33 +23,39 @@ class Gameboard {
   }
   addShip(coordinates, length) {
     this.ships.push(new Ship(length));
-    coordinates.forEach((item) => {
-      this.board[item] = this.ships.length - 1;
+    coordinates.forEach((item, index) => {
+      this.board[item] = {
+        id: this.ships.length - 1,
+        part: index,
+        isHit: false,
+      };
     });
-  }
-  getLocation(coordinate) {
-    const shipCoordinates = this.board.reduce(function (
-      cords,
-      curr,
-      index,
-      arr
-    ) {
-      if (curr === arr[coordinate]) cords.push(index);
-      return cords;
-    },
-    []);
-    return shipCoordinates;
   }
   receiveAttack(coordinate) {
     if (this.board[coordinate] === null)
-      return (this.board[coordinate] = 'missed');
-    const hitLocation = this.getLocation(coordinate).indexOf(coordinate);
-    const shipIndex = this.board[coordinate];
-    this.ships[shipIndex].hit(hitLocation);
+      return (this.board[coordinate] = { isMissed: true });
+    this.ships[this.board[coordinate].id].hit(this.board[coordinate].part);
+    this.board[coordinate].isHit = true;
   }
   reportAllSunk() {
     return this.ships.every((ship) => ship.sunk === true);
   }
 }
 
-export { Ship, Gameboard };
+class Player {
+  constructor(name) {
+    this.name = name;
+  }
+  randomAttack(gameboard) {
+    const legalAttacks = gameboard.board.reduce(function (cells, curr, index) {
+      if (curr === null || curr.isHit !== true || curr.isMissed !== true)
+        cells.push(index);
+      return cells;
+    }, []);
+    const randomLegal =
+      legalAttacks[Math.floor(Math.random() * legalAttacks.length)];
+    gameboard.receiveAttack(randomLegal);
+  }
+}
+
+export { Ship, Gameboard, Player };
