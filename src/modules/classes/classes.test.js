@@ -1,4 +1,6 @@
-import { Ship, Gameboard, Player } from './classes';
+import Ship from './ship';
+import Gameboard from './gameboard';
+import Player from './player';
 
 test('Ship stores hit locations', () => {
   const mockShip = new Ship(4);
@@ -55,7 +57,7 @@ test('Gameboard reports all ships have been sunk', () => {
 
 test('Player makes a random movie', () => {
   const gameboard = new Gameboard();
-  const player = new Player();
+  const player = new Player('mock', gameboard);
   gameboard.init();
   player.randomAttack(gameboard);
   expect(gameboard.board).toEqual(

@@ -3,7 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['airbnb', 'prettier'],
+  extends: ['airbnb-base', 'prettier'],
   parserOptions: {
     ecmaVersion: 12,
     sourceType: 'module',

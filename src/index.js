@@ -1,1 +1,1 @@
-import { Gameboard } from './modules/classes';
+import placeShipRandomly from './modules/logic';
