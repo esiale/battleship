@@ -1,21 +1,5 @@
-import Ship from './ship';
-import Gameboard from './gameboard';
+import { placeShipRandomly, Gameboard } from './gameboard';
 import Player from './player';
-
-test('Ship stores hit locations', () => {
-  const mockShip = new Ship(4);
-  mockShip.hit(1);
-  mockShip.hit(3);
-  expect(mockShip.hits).toMatchObject([null, 'hit', null, 'hit']);
-});
-
-test("Ship reports that it's been sunk", () => {
-  const mockShip = new Ship(3);
-  mockShip.hit(0);
-  mockShip.hit(1);
-  mockShip.hit(2);
-  expect(mockShip.sunk).toEqual(true);
-});
 
 test('Gameboard adds new ship and stores it properly', () => {
   const gameboard = new Gameboard();
@@ -67,4 +51,35 @@ test('Player makes a random movie', () => {
       }),
     ])
   );
+});
+
+// beforeEach(() => {
+//   jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
+// });
+
+// afterEach(() => {
+//   jest.spyOn(global.Math, 'random').mockRestore();
+// });
+
+test('Ships can be randomly placed', () => {
+  jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
+  const gameboard = new Gameboard();
+  gameboard.init();
+  placeShipRandomly(2, gameboard);
+  expect(gameboard.board[50].id).toEqual(0);
+  expect(gameboard.board[51].id).toEqual(0);
+  jest.spyOn(global.Math, 'random').mockRestore();
+});
+
+test('Randomly placed ships don\t extend the border horizontally', () => {
+  jest.spyOn(global.Math, 'random').mockReturnValue(0.9);
+  const gameboard = new Gameboard();
+  gameboard.init();
+  placeShipRandomly(5, gameboard);
+  expect(gameboard.board[90].id).toEqual(0);
+  expect(gameboard.board[91].id).toEqual(0);
+  expect(gameboard.board[92].id).toEqual(0);
+  expect(gameboard.board[93].id).toEqual(0);
+  expect(gameboard.board[94].id).toEqual(0);
+  jest.spyOn(global.Math, 'random').mockRestore();
 });
