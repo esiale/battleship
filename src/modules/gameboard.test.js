@@ -1,4 +1,4 @@
-import { placeShipRandomly, Gameboard } from './gameboard';
+import Gameboard from './gameboard';
 import Player from './player';
 
 test('Gameboard adds new ship and stores it properly', () => {
@@ -53,33 +53,39 @@ test('Player makes a random movie', () => {
   );
 });
 
-// beforeEach(() => {
-//   jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
-// });
-
-// afterEach(() => {
-//   jest.spyOn(global.Math, 'random').mockRestore();
-// });
-
-test('Ships can be randomly placed', () => {
-  jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
+test('Checks for placement conflicts', () => {
   const gameboard = new Gameboard();
   gameboard.init();
-  placeShipRandomly(2, gameboard);
-  expect(gameboard.board[50].id).toEqual(0);
-  expect(gameboard.board[51].id).toEqual(0);
-  jest.spyOn(global.Math, 'random').mockRestore();
+  gameboard.addShip([54, 55], 2);
+  expect(gameboard.checkForConflicts([54, 55])).toEqual(false);
+  expect(gameboard.checkForConflicts([79, 89, 99])).toEqual(true);
+  expect(gameboard.checkForConflicts([89, 97, 107])).toEqual(false);
+  expect(gameboard.checkForConflicts([77, 78, 79])).toEqual(true);
+  expect(gameboard.checkForConflicts([78, 79, 80])).toEqual(false);
 });
 
-test('Randomly placed ships don\t extend the border horizontally', () => {
-  jest.spyOn(global.Math, 'random').mockReturnValue(0.9);
+test('Player ship is placed', () => {
   const gameboard = new Gameboard();
   gameboard.init();
-  placeShipRandomly(5, gameboard);
-  expect(gameboard.board[90].id).toEqual(0);
-  expect(gameboard.board[91].id).toEqual(0);
-  expect(gameboard.board[92].id).toEqual(0);
-  expect(gameboard.board[93].id).toEqual(0);
-  expect(gameboard.board[94].id).toEqual(0);
-  jest.spyOn(global.Math, 'random').mockRestore();
+
+  const mockPreview = {
+    dataset: {
+      vertical: false,
+    },
+    length: 5,
+  };
+
+  const mockTarget = {
+    dataset: {
+      index: 50,
+    },
+  };
+
+  mockPreview.dataset.vertical = false;
+  gameboard.placePlayerShip(mockTarget, mockPreview);
+  expect(gameboard.board[50].id).toEqual(0);
+  expect(gameboard.board[51].id).toEqual(0);
+  expect(gameboard.board[51].id).toEqual(0);
+  expect(gameboard.board[51].id).toEqual(0);
+  expect(gameboard.board[51].id).toEqual(0);
 });

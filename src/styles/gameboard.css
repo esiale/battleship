@@ -1,33 +1,12 @@
-body {
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  padding: 0;
-}
-
-.wrapper {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.boards-wrapper {
-  display: flex;
-  flex-direction: row;
-  max-height: 100%;
-  max-width: 100%;
-}
-
 .gameboard1,
 .gameboard2 {
-  border: 0.1rem black solid;
+  outline: 0.1rem black solid;
   display: grid;
-  width: 30rem;
-  height: 30rem;
+  width: 25rem;
+  height: 25rem;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
+  margin: 1rem;
 }
 
 .cell {
@@ -39,8 +18,16 @@ body {
   color: white;
 }
 
-@media only screen and (max-width: 974px) {
+@media only screen and (max-width: 880px) {
+  .wrapper {
+    justify-content: space-between;
+  }
   .boards-wrapper {
     flex-direction: column;
+  }
+  .gameboard1,
+  .gameboard2 {
+    width: 18rem;
+    height: 18rem;
   }
 }

@@ -22,8 +22,10 @@ class Gameboard {
   }
 
   receiveAttack(coordinate) {
-    if (this.board[coordinate] === null)
-      return (this.board[coordinate] = { isMissed: true });
+    if (this.board[coordinate] === null) {
+      this.board[coordinate] = { isMissed: true };
+      return;
+    }
     this.ships[this.board[coordinate].id].hit(this.board[coordinate].part);
     this.board[coordinate].isHit = true;
   }
@@ -31,82 +33,65 @@ class Gameboard {
   reportAllSunk() {
     return this.ships.every((ship) => ship.sunk === true);
   }
+
+  checkForConflicts(location) {
+    if (location.some((item) => item > 99)) return false;
+
+    const rightBorder = [9, 19, 29, 39, 49, 59, 69, 79, 89];
+    if (
+      // eslint-disable-next-line arrow-body-style
+      rightBorder.some((number) => {
+        return [number, number + 1].every((item) => location.includes(item));
+      })
+    ) {
+      return false;
+    }
+
+    if (location.some((item) => this.board[item] !== null)) {
+      return false;
+    }
+    return true;
+  }
+
+  findRandomShipLocation(length) {
+    const vertical = Math.random() > 0.5;
+    const validLocations = [];
+
+    for (let i = 0; i < 100 - length; i += 1) {
+      const possibleLocations = [];
+      if (vertical === true) {
+        for (let y = 0; y < length; y += 1) {
+          possibleLocations.push(i + y * 10);
+        }
+      } else if (vertical === false) {
+        for (let y = 0; y < length; y += 1) {
+          possibleLocations.push(y + i);
+        }
+      }
+      if (this.checkForConflicts(possibleLocations))
+        validLocations.push(possibleLocations);
+    }
+    return validLocations[Math.floor(Math.random() * validLocations.length)];
+  }
+
+  placePlayerShip(target, preview) {
+    const locationArray = [];
+    if (preview.dataset.vertical === 'false') {
+      for (let i = 0; i < preview.dataset.length; i += 1) {
+        locationArray.push(parseInt(target.dataset.index, 10) + i);
+      }
+    }
+    if (preview.dataset.vertical === 'true') {
+      for (let i = 0; i < preview.dataset.length; i += 1) {
+        locationArray.push(parseInt(target.dataset.index, 10) + i * 10);
+      }
+    }
+    if (this.checkForConflicts(locationArray) === true) {
+      this.addShip(locationArray, parseInt(preview.dataset.length, 10));
+      return true;
+    }
+    return false;
+  }
 }
 
-const leftBorder = () => {
-  const border = [];
-  for (let i = 0; i <= 90; i += 10) {
-    border.push(i);
-  }
-  console.log(border);
-  return border;
-};
-
-const rightBorder = () => {
-  const border = [];
-  for (let i = 9; i <= 99; i += 10) {
-    border.push(i);
-  }
-  console.log(border);
-  return border;
-};
-
-const getRandomCell = (gameboard) => {
-  const freeCells = gameboard.board.reduce((cells, curr, index) => {
-    if (curr === null) cells.push(index);
-    return cells;
-  }, []);
-  const randomCell = freeCells[Math.floor(Math.random() * freeCells.length)];
-  return randomCell;
-};
-
-const placeShipRandomly = (length, gameboard) => {
-  const randomCell = getRandomCell(gameboard);
-  const coordinates = [];
-  const vertical = Math.random() < 0.5;
-  if (vertical === true) {
-    coordinates.push(randomCell);
-    let belowCell = randomCell + 10;
-    let aboveCell = randomCell - 10;
-    for (let i = 1; i < length; i += 1) {
-      if (gameboard.board[belowCell] === null && belowCell < 99) {
-        coordinates.push(belowCell);
-        belowCell += 10;
-      } else if (gameboard.board[aboveCell] === null && aboveCell > 0) {
-        coordinates.push(aboveCell);
-        aboveCell -= 10;
-      } else return placeShipRandomly(length, gameboard);
-    }
-  }
-  if (vertical === false) {
-    coordinates.push(randomCell);
-    let leftCell = randomCell - 1;
-    let rightCell = randomCell + 1;
-    for (let i = 1; i < length; i += 1) {
-      if (
-        gameboard.board[leftCell] === null &&
-        !rightBorder().includes(leftCell)
-      ) {
-        coordinates.push(leftCell);
-        leftCell -= 1;
-      } else if (
-        gameboard.board[rightCell] === null &&
-        !leftBorder().includes(rightCell)
-      ) {
-        coordinates.push(rightCell);
-        rightCell += 1;
-      } else return placeShipRandomly(length, gameboard);
-    }
-  }
-  return gameboard.addShip(coordinates, length);
-};
-
-const randomizeShips = (gameboard) => {
-  placeShipRandomly(5, gameboard);
-  placeShipRandomly(4, gameboard);
-  placeShipRandomly(3, gameboard);
-  placeShipRandomly(3, gameboard);
-  placeShipRandomly(2, gameboard);
-};
-
-export { Gameboard, placeShipRandomly, randomizeShips };
+export default Gameboard;
