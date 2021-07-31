@@ -59,40 +59,6 @@ const handleAttack = (e) => {
   }
 };
 
-const highlightPlacement = (e) => {
-  const cells = document.querySelectorAll('.gameboard1 .cell');
-  const shipPreview = document.querySelector('.ship-preview');
-  const length = +shipPreview.dataset.length;
-  const highlightedCells = [];
-  const cellIndex = +e.target.dataset.index;
-  if (shipPreview.dataset.vertical === 'false') {
-    for (let i = 0; i < length; i += 1) {
-      highlightedCells.push(cellIndex + i);
-    }
-    const rightBorder = [9, 19, 29, 39, 49, 59, 69, 79, 89];
-    const borderCell = rightBorder.filter((number) =>
-      [number, number + 1].every((item) => highlightedCells.includes(item))
-    );
-    if (borderCell.length === 1) {
-      const index = highlightedCells.indexOf(borderCell[0]) + 1;
-      highlightedCells.splice(index);
-    }
-  } else if (shipPreview.dataset.vertical === 'true') {
-    for (let i = 0; i < length; i += 1) {
-      highlightedCells.push(cellIndex + i * 10);
-    }
-  }
-  cells.forEach((cell, index) => {
-    if (highlightedCells.includes(index) && !cell.classList.contains('ship'))
-      cell.classList.add('highlight');
-  });
-};
-
-const removeHighlightPlacement = () => {
-  const cells = document.querySelectorAll('.gameboard1 .cell');
-  cells.forEach((cell) => cell.classList.remove('highlight'));
-};
-
 const drawShips = (gameboard) => {
   gameboard.board.forEach((item, index) => {
     if (item === null) return;
@@ -120,21 +86,25 @@ const renderPreview = (length) => {
   shipPreview.dataset.length = length;
   shipPreview.dataset.vertical = false;
   for (let i = 0; i < length; i += 1) {
+    const shipDrag = document.querySelector('.ship-drag');
     const cell = document.createElement('div');
     cell.className = 'preview-cell';
-    shipPreview.appendChild(cell);
+    shipDrag.appendChild(cell);
   }
 };
 
 const rotateShip = () => {
   const shipPreview = document.querySelector('.ship-preview');
+  const shipDrag = document.querySelector('.ship-drag');
   const rotateButton = document.querySelector('.rotate-btn');
   if (shipPreview.dataset.vertical === 'false') {
     shipPreview.dataset.vertical = 'true';
     rotateButton.textContent = 'Vertical';
+    shipDrag.style.flexDirection = 'column';
   } else {
     shipPreview.dataset.vertical = 'false';
     rotateButton.textContent = 'Horizontal';
+    shipDrag.style.flexDirection = 'row';
   }
 };
 
@@ -158,17 +128,18 @@ const resetShips = () => {
 
 const nextShip = () => {
   const shipPreview = document.querySelector('.ship-preview');
+  const shipDrag = document.querySelector('.ship-drag');
   if (+shipPreview.dataset.length === 5) {
-    shipPreview.removeChild(shipPreview.lastChild);
+    shipDrag.removeChild(shipDrag.lastChild);
     shipPreview.dataset.length = 4;
   } else if (+shipPreview.dataset.length === 4) {
-    shipPreview.removeChild(shipPreview.lastChild);
+    shipDrag.removeChild(shipDrag.lastChild);
     shipPreview.dataset.length = 3;
   } else if (
     +shipPreview.dataset.length === 3 &&
     logic.data.gameboards.gameboard1.ships.length === 4
   ) {
-    shipPreview.removeChild(shipPreview.lastChild);
+    shipDrag.removeChild(shipDrag.lastChild);
     shipPreview.dataset.length = 2;
   } else if (logic.data.gameboards.gameboard1.ships.length === 5) {
     // eslint-disable-next-line no-use-before-define
@@ -189,12 +160,6 @@ const handleShipPlacement = (e) => {
 };
 
 const applyListeners = () => {
-  const cells = document.querySelectorAll('.gameboard1 .cell');
-  cells.forEach((item) => {
-    item.addEventListener('click', handleShipPlacement);
-    item.addEventListener('mouseenter', highlightPlacement);
-    item.addEventListener('mouseleave', removeHighlightPlacement);
-  });
   const rotateButton = document.querySelector('.rotate-btn');
   rotateButton.addEventListener('click', rotateShip);
   const resetButton = document.querySelector('.reset-btn');
@@ -218,8 +183,6 @@ function prepareStart() {
   const playerCells = document.querySelectorAll('.gameboard1 .cell');
   playerCells.forEach((cell) => {
     cell.removeEventListener('click', handleShipPlacement);
-    cell.removeEventListener('mouseenter', highlightPlacement);
-    cell.removeEventListener('mouseleave', removeHighlightPlacement);
     if (cell.classList.contains('highlight'))
       cell.classList.remove('highlight');
   });
@@ -229,4 +192,4 @@ function prepareStart() {
   });
 }
 
-export { renderAll, resetShips };
+export { renderAll, resetShips, handleShipPlacement };

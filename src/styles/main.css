@@ -50,6 +50,14 @@ body {
   justify-content: center;
 }
 
+.ship-drag {
+  display: flex;
+}
+
+.hide {
+  visibility: hidden;
+}
+
 .preview-cell {
   width: 2.5rem;
   height: 2.5rem;
