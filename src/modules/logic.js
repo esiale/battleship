@@ -12,8 +12,8 @@ const logic = {
     this.data.gameboards.gameboard2 = new Gameboard('gameboard2');
     this.data.gameboards.gameboard1.init();
     this.data.gameboards.gameboard2.init();
-    this.data.players = new Player('human', 'gameboard1');
-    this.data.players = new Player('ai', 'gameboard2');
+    this.data.players.player1 = new Player('human', 'gameboard1');
+    this.data.players.player2 = new Player('ai', 'gameboard2');
   },
 
   placeComputerShips() {

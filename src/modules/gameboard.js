@@ -24,10 +24,11 @@ class Gameboard {
   receiveAttack(coordinate) {
     if (this.board[coordinate] === null) {
       this.board[coordinate] = { isMissed: true };
-      return;
+      return 'missed';
     }
     this.ships[this.board[coordinate].id].hit(this.board[coordinate].part);
     this.board[coordinate].isHit = true;
+    return 'hit';
   }
 
   reportAllSunk() {
@@ -91,6 +92,24 @@ class Gameboard {
       return true;
     }
     return false;
+  }
+
+  processAttack(index) {
+    const feedback = {
+      result: null,
+      isSunk: false,
+      reportAllSunk: false,
+    };
+    feedback.result = this.receiveAttack(index);
+    if (
+      this.board[index] !== null &&
+      // eslint-disable-next-line no-prototype-builtins
+      !this.board[index].hasOwnProperty('isMissed')
+    ) {
+      feedback.isSunk = this.ships[this.board[index].id].sunk;
+      feedback.reportAllSunk = this.reportAllSunk();
+    }
+    return feedback;
   }
 }
 

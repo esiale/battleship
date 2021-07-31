@@ -70,9 +70,9 @@ test('Player ship is placed', () => {
 
   const mockPreview = {
     dataset: {
-      vertical: false,
+      vertical: 'false',
+      length: 5,
     },
-    length: 5,
   };
 
   const mockTarget = {
@@ -81,11 +81,11 @@ test('Player ship is placed', () => {
     },
   };
 
-  mockPreview.dataset.vertical = false;
+  mockPreview.dataset.vertical = 'false';
   gameboard.placePlayerShip(mockTarget, mockPreview);
   expect(gameboard.board[50].id).toEqual(0);
   expect(gameboard.board[51].id).toEqual(0);
-  expect(gameboard.board[51].id).toEqual(0);
-  expect(gameboard.board[51].id).toEqual(0);
-  expect(gameboard.board[51].id).toEqual(0);
+  expect(gameboard.board[52].id).toEqual(0);
+  expect(gameboard.board[53].id).toEqual(0);
+  expect(gameboard.board[54].id).toEqual(0);
 });
