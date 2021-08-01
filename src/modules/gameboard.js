@@ -75,20 +75,20 @@ class Gameboard {
     return validLocations[Math.floor(Math.random() * validLocations.length)];
   }
 
-  placePlayerShip(target, preview) {
+  placePlayerShip(cell, length, orientation) {
     const locationArray = [];
-    if (preview.dataset.vertical === 'false') {
-      for (let i = 0; i < preview.dataset.length; i += 1) {
-        locationArray.push(parseInt(target.dataset.index, 10) + i);
+    if (orientation === 'horizontal') {
+      for (let i = 0; i < length; i += 1) {
+        locationArray.push(cell + i);
       }
     }
-    if (preview.dataset.vertical === 'true') {
-      for (let i = 0; i < preview.dataset.length; i += 1) {
-        locationArray.push(parseInt(target.dataset.index, 10) + i * 10);
+    if (orientation === 'vertical') {
+      for (let i = 0; i < length; i += 1) {
+        locationArray.push(cell + i * 10);
       }
     }
     if (this.checkForConflicts(locationArray) === true) {
-      this.addShip(locationArray, parseInt(preview.dataset.length, 10));
+      this.addShip(locationArray, length);
       return true;
     }
     return false;

@@ -71,36 +71,34 @@ const renderBoard = (gameboard) => {
     const newCell = document.createElement('div');
     newCell.className = 'cell';
     newCell.dataset.index = i;
+    newCell.textContent = i;
     board.append(newCell);
   }
   const wrapper = document.querySelector('.boards-wrapper');
   wrapper.append(board);
 };
 
-const renderPreview = (length) => {
-  const shipPreview = document.querySelector('.ship-preview');
-  shipPreview.dataset.length = length;
-  shipPreview.dataset.vertical = false;
+const renderDragShip = (ship, length) => {
+  const shipContainer = document.querySelector('.ship-container');
   for (let i = 0; i < length; i += 1) {
-    const shipDrag = document.querySelector('.ship-drag');
-    const cell = document.createElement('div');
-    cell.className = 'preview-cell';
-    shipDrag.appendChild(cell);
+    const grid = document.createElement('div');
+    grid.className = ship;
+    grid.dataset.index = i;
+    shipContainer.appendChild(grid);
   }
 };
 
 const rotateShip = () => {
-  const shipPreview = document.querySelector('.ship-preview');
-  const shipDrag = document.querySelector('.ship-drag');
+  const shipContainer = document.querySelector('.ship-container');
   const rotateButton = document.querySelector('.rotate-btn');
-  if (shipPreview.dataset.vertical === 'false') {
-    shipPreview.dataset.vertical = 'true';
+  if (shipContainer.dataset.orientation === 'horizontal') {
+    shipContainer.dataset.orientation = 'vertical';
     rotateButton.textContent = 'Vertical';
-    shipDrag.style.flexDirection = 'column';
+    shipContainer.style.flexDirection = 'column';
   } else {
-    shipPreview.dataset.vertical = 'false';
+    shipContainer.dataset.orientation = 'horizontal';
     rotateButton.textContent = 'Horizontal';
-    shipDrag.style.flexDirection = 'row';
+    shipContainer.style.flexDirection = 'row';
   }
 };
 
@@ -114,17 +112,16 @@ const resetShips = () => {
   cells.forEach((item) => {
     if (item.classList.contains('ship')) item.classList.remove('ship');
   });
-  const shipPreview = document.querySelector('.ship-preview');
-  while (shipPreview.firstChild) {
-    shipPreview.firstChild.remove();
+  const shipContainer = document.querySelector('.ship-container');
+  while (shipContainer.firstChild) {
+    shipContainer.firstChild.remove();
   }
-  shipPreview.dataset.length = 5;
-  renderPreview(5);
+  renderDragShip('carrier', 5);
 };
 
 const prepareStart = () => {
-  const shipPreview = document.querySelector('.ship-preview');
-  shipPreview.className = 'ship-preview-hidden';
+  const shipContainer = document.querySelector('.ship-container');
+  shipContainer.className = 'ship-container-hidden';
   const buttons = document.querySelector('.buttons');
   buttons.className = 'buttons-hidden';
   const computerCells = document.querySelectorAll('.gameboard2 .cell');
@@ -134,31 +131,31 @@ const prepareStart = () => {
 };
 
 const nextShip = () => {
-  const shipPreview = document.querySelector('.ship-preview');
-  const shipDrag = document.querySelector('.ship-drag');
-  if (+shipPreview.dataset.length === 5) {
-    shipDrag.removeChild(shipDrag.lastChild);
-    shipPreview.dataset.length = 4;
-  } else if (+shipPreview.dataset.length === 4) {
-    shipDrag.removeChild(shipDrag.lastChild);
-    shipPreview.dataset.length = 3;
-  } else if (
-    +shipPreview.dataset.length === 3 &&
-    logic.data.gameboards.gameboard1.ships.length === 4
-  ) {
-    shipDrag.removeChild(shipDrag.lastChild);
-    shipPreview.dataset.length = 2;
-  } else if (logic.data.gameboards.gameboard1.ships.length === 5) {
+  const shipContainer = document.querySelector('.ship-container');
+  const grids = shipContainer.querySelectorAll('div');
+  const currentShip = grids[0].className;
+  while (shipContainer.firstChild) {
+    shipContainer.removeChild(shipContainer.firstChild);
+  }
+  if (currentShip === 'carrier') {
+    renderDragShip('battleship', 4);
+  } else if (currentShip === 'battleship') {
+    renderDragShip('submarine', 3);
+  } else if (currentShip === 'submarine') {
+    renderDragShip('cruiser', 3);
+  } else if (currentShip === 'cruiser') {
+    renderDragShip('destroyer', 2);
+  } else if (currentShip === 'destroyer') {
     prepareStart();
   }
 };
 
-const handleShipPlacement = (e) => {
-  const targetCell = e.target;
-  const shipPreview = document.querySelector('.ship-preview');
-  if (logic.data.gameboards.gameboard1.ships.length === 5) return;
+const handleShipPlacement = (cell) => {
+  const shipContainer = document.querySelector('.ship-container');
+  const { orientation } = shipContainer.dataset;
+  const { length } = shipContainer.querySelectorAll('div');
   if (
-    logic.data.gameboards.gameboard1.placePlayerShip(targetCell, shipPreview)
+    logic.data.gameboards.gameboard1.placePlayerShip(cell, length, orientation)
   ) {
     drawShips(logic.data.gameboards.gameboard1);
     nextShip();
@@ -175,7 +172,7 @@ const applyListeners = () => {
 const renderAll = () => {
   renderBoard(logic.data.gameboards.gameboard1);
   renderBoard(logic.data.gameboards.gameboard2);
-  renderPreview(5);
+  renderDragShip('carrier', 5);
   // FOR STYLING - REMOVE BEFORE PUBLISHING //
   drawShips(logic.data.gameboards.gameboard2);
   applyListeners();

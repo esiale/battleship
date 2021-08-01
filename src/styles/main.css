@@ -45,12 +45,12 @@ body {
   height: 100%;
 }
 
-.ship-preview {
+.ship-drag {
   display: flex;
   justify-content: center;
 }
 
-.ship-drag {
+.ship-container {
   display: flex;
 }
 
@@ -58,10 +58,15 @@ body {
   visibility: hidden;
 }
 
-.preview-cell {
+.carrier,
+.battleship,
+.submarine,
+.cruiser,
+.destroyer {
   width: 2.5rem;
   height: 2.5rem;
   background-color: red;
+  border: 0.1rem black solid;
 }
 
 .buttons {
@@ -69,7 +74,7 @@ body {
   justify-content: center;
 }
 
-.ship-preview-hidden {
+.ship-container-hidden {
   display: none;
 }
 
