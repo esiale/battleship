@@ -94,22 +94,15 @@ class Gameboard {
     return false;
   }
 
-  processAttack(index) {
-    const feedback = {
-      result: null,
-      isSunk: false,
-      reportAllSunk: false,
-    };
-    feedback.result = this.receiveAttack(index);
-    if (
-      this.board[index] !== null &&
-      // eslint-disable-next-line no-prototype-builtins
-      !this.board[index].hasOwnProperty('isMissed')
-    ) {
-      feedback.isSunk = this.ships[this.board[index].id].sunk;
-      feedback.reportAllSunk = this.reportAllSunk();
-    }
-    return feedback;
+  randomAttack() {
+    const legalAttacks = this.board.reduce((cells, curr, index) => {
+      if (curr === null || (curr.isHit !== true && curr.isMissed !== true))
+        cells.push(index);
+      return cells;
+    }, []);
+    const randomLegal =
+      legalAttacks[Math.floor(Math.random() * legalAttacks.length)];
+    return randomLegal;
   }
 }
 

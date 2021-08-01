@@ -24,6 +24,51 @@ const logic = {
     gameboard.addShip(gameboard.findRandomShipLocation(2), 2);
     gameboard.addShip(gameboard.findRandomShipLocation(2), 2);
   },
+
+  processAttack(cell, board) {
+    const gameboard = this.data.gameboards[board];
+    const result = this.data.gameboards[board].receiveAttack(cell);
+    const feedback = {
+      action: null,
+      cell: null,
+      board: null,
+      allSunk: false,
+    };
+    const shipIndex = gameboard.board[cell].id;
+    if (result === 'missed') {
+      feedback.action = 'missed';
+      feedback.cell = cell;
+      feedback.board = gameboard.name;
+      return feedback;
+    }
+    if (gameboard.ships[shipIndex].sunk) {
+      const allShipsCords = gameboard.board.reduce((acc, element, index) => {
+        if (element !== null && !element.hasOwnProperty('isMissed'))
+          acc.push(index);
+        return acc;
+      }, []);
+      const sunkShipCords = allShipsCords.reduce((acc, element) => {
+        if (gameboard.board[element].id === shipIndex) acc.push(element);
+        return acc;
+      }, []);
+      feedback.action = 'sunk';
+      feedback.cell = sunkShipCords;
+      if (gameboard.reportAllSunk() === true) {
+        feedback.allSunk = true;
+      }
+    } else if (result === 'hit') {
+      feedback.action = 'hit';
+      feedback.cell = cell;
+    }
+    feedback.board = gameboard.name;
+    return feedback;
+  },
+
+  initiateComputerMove() {
+    const playerBoard = this.data.gameboards.gameboard1;
+    const randomMove = Player.randomAttack(playerBoard);
+    return this.processAttack(randomMove, 'gameboard1');
+  },
 };
 
 // eslint-disable-next-line import/prefer-default-export

@@ -1,18 +1,17 @@
 class Player {
-  constructor(name, gameboard) {
+  constructor(name) {
     this.name = name;
-    this.gameboard = gameboard;
   }
 
-  randomAttack() {
-    const legalAttacks = this.gameboard.board.reduce((cells, curr, index) => {
-      if (curr === null || curr.isHit !== true || curr.isMissed !== true)
+  static randomAttack(gameboard) {
+    const legalAttacks = gameboard.board.reduce((cells, curr, index) => {
+      if (curr === null || (curr.isHit !== true && curr.isMissed !== true))
         cells.push(index);
       return cells;
     }, []);
     const randomLegal =
       legalAttacks[Math.floor(Math.random() * legalAttacks.length)];
-    this.gameboard.receiveAttack(randomLegal);
+    return randomLegal;
   }
 }
 

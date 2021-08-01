@@ -1,62 +1,58 @@
+/* eslint-disable no-prototype-builtins */
 import { logic } from './logic';
 
 const concludeGame = (player) => {
   alert(`${player} has lost!`);
 };
 
-const mark = (action, target, gameboardName) => {
-  const gameboard = document.querySelector(`.${gameboardName}`);
+const updateBoard = (action, target, board) => {
+  const gameboard = document.querySelector(`.${board}`);
   const cell = gameboard.querySelector(`[data-index='${target}']`);
-  if (action === 'hit') {
-    cell.classList.remove('ship');
-    cell.classList.add('hit');
-  }
-  if (action === 'missed') {
-    cell.classList.add('missed');
-  }
-  if (action === 'sunk') {
-    target.forEach((item) => {
-      const sunkCell = gameboard.querySelector(`[data-index='${item}']`);
-      sunkCell.classList.remove('hit');
-      sunkCell.classList.add('sunk');
-    });
+  switch (action) {
+    case 'hit':
+      cell.classList.remove('ship');
+      cell.classList.add('hit');
+      break;
+    case 'missed':
+      cell.classList.add('missed');
+      break;
+    case 'sunk':
+      target.forEach((item) => {
+        const sunkCell = gameboard.querySelector(`[data-index='${item}']`);
+        sunkCell.classList.remove('hit');
+        sunkCell.classList.add('sunk');
+      });
+      break;
+    default:
   }
 };
 
-const handleAttack = (e) => {
-  const gameboardName = e.target.parentNode.className;
-  const cell = +e.target.dataset.index;
-  const playerNames = Object.keys(logic.data.players);
-  const player = playerNames.filter(
-    (item) => logic.data.players[item].gameboard === gameboardName
-  )[0];
-  const gameboard = logic.data.gameboards[gameboardName];
-  const feedback = gameboard.processAttack(cell);
-  if (feedback.isSunk === true) {
-    const shipIndex = gameboard.board[cell].id;
-    const allShips = gameboard.board.reduce((acc, element, index) => {
-      if (element !== null && !element.hasOwnProperty('isMissed'))
-        acc.push(index);
-      return acc;
-    }, []);
-    const sunkShip = allShips.reduce((acc, element) => {
-      if (gameboard.board[element].id === shipIndex) acc.push(element);
-      return acc;
-    }, []);
-    mark('sunk', sunkShip, gameboardName);
-    const gameboardDom = document.querySelector(`.${gameboardName}`);
-    sunkShip.forEach((item) => {
-      const sunkCell = gameboardDom.querySelector(`[data-index='${item}']`);
-      sunkCell.removeEventListener('click', handleAttack);
+const initiateAttack = (e) => {
+  const cell = e.target.dataset.index;
+  const board = document.querySelector(`.gameboard2`);
+  const cells = board.querySelectorAll('div');
+  const feedback = logic.processAttack(cell, 'gameboard2');
+  updateBoard(feedback.action, feedback.cell, feedback.board);
+  cells.forEach((item) => {
+    item.removeEventListener('click', initiateAttack);
+  });
+  const computerFeedback = logic.initiateComputerMove();
+  setTimeout(() => {
+    updateBoard(
+      computerFeedback.action,
+      computerFeedback.cell,
+      computerFeedback.board
+    );
+    cells.forEach((item) => {
+      if (
+        !item.classList.contains('hit') &&
+        !item.classList.contains('missed') &&
+        !item.classList.contains('sunk')
+      ) {
+        item.addEventListener('click', initiateAttack);
+      }
     });
-    if (feedback.reportAllSunk === true) return concludeGame(player);
-  } else if (feedback.result === 'hit') {
-    mark('hit', cell, gameboardName);
-    e.target.removeEventListener('click', handleAttack);
-  } else if (feedback.result === 'missed') {
-    mark('missed', cell, gameboardName);
-    e.target.removeEventListener('click', handleAttack);
-  }
+  }, 500);
 };
 
 const drawShips = (gameboard) => {
@@ -126,6 +122,17 @@ const resetShips = () => {
   renderPreview(5);
 };
 
+const prepareStart = () => {
+  const shipPreview = document.querySelector('.ship-preview');
+  shipPreview.className = 'ship-preview-hidden';
+  const buttons = document.querySelector('.buttons');
+  buttons.className = 'buttons-hidden';
+  const computerCells = document.querySelectorAll('.gameboard2 .cell');
+  computerCells.forEach((item) => {
+    item.addEventListener('click', initiateAttack);
+  });
+};
+
 const nextShip = () => {
   const shipPreview = document.querySelector('.ship-preview');
   const shipDrag = document.querySelector('.ship-drag');
@@ -142,7 +149,6 @@ const nextShip = () => {
     shipDrag.removeChild(shipDrag.lastChild);
     shipPreview.dataset.length = 2;
   } else if (logic.data.gameboards.gameboard1.ships.length === 5) {
-    // eslint-disable-next-line no-use-before-define
     prepareStart();
   }
 };
@@ -174,22 +180,5 @@ const renderAll = () => {
   drawShips(logic.data.gameboards.gameboard2);
   applyListeners();
 };
-
-function prepareStart() {
-  const shipPreview = document.querySelector('.ship-preview');
-  shipPreview.className = 'ship-preview-hidden';
-  const buttons = document.querySelector('.buttons');
-  buttons.className = 'buttons-hidden';
-  const playerCells = document.querySelectorAll('.gameboard1 .cell');
-  playerCells.forEach((cell) => {
-    cell.removeEventListener('click', handleShipPlacement);
-    if (cell.classList.contains('highlight'))
-      cell.classList.remove('highlight');
-  });
-  const computerCells = document.querySelectorAll('.gameboard2 .cell');
-  computerCells.forEach((item) => {
-    item.addEventListener('click', handleAttack);
-  });
-}
 
 export { renderAll, resetShips, handleShipPlacement };
