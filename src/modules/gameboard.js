@@ -10,7 +10,8 @@ class Gameboard {
     this.board = Array(100).fill(null);
   }
 
-  addShip(coordinates, length) {
+  addShip(coordinates) {
+    const { length } = coordinates;
     this.ships.push(new Ship(length));
     coordinates.forEach((item, index) => {
       this.board[item] = {
@@ -92,17 +93,6 @@ class Gameboard {
       return true;
     }
     return false;
-  }
-
-  randomAttack() {
-    const legalAttacks = this.board.reduce((cells, curr, index) => {
-      if (curr === null || (curr.isHit !== true && curr.isMissed !== true))
-        cells.push(index);
-      return cells;
-    }, []);
-    const randomLegal =
-      legalAttacks[Math.floor(Math.random() * legalAttacks.length)];
-    return randomLegal;
   }
 }
 

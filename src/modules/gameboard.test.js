@@ -39,19 +39,6 @@ test('Gameboard reports all ships have been sunk', () => {
   expect(gameboard.reportAllSunk()).toEqual(true);
 });
 
-test.todo('Player makes a random movie');
-// , () => {
-// logic.initalizeGame();
-// player.randomAttack(gameboard);
-// expect(gameboard.board).toEqual(
-//   expect.arrayContaining([
-//     expect.objectContaining({
-//       isMissed: true,
-//     }),
-//   ])
-// );
-// });
-
 test('Checks for placement conflicts', () => {
   const gameboard = new Gameboard();
   gameboard.init();
@@ -67,21 +54,7 @@ test('Player ship is placed', () => {
   const gameboard = new Gameboard();
   gameboard.init();
 
-  const mockPreview = {
-    dataset: {
-      vertical: 'false',
-      length: 5,
-    },
-  };
-
-  const mockTarget = {
-    dataset: {
-      index: 50,
-    },
-  };
-
-  mockPreview.dataset.vertical = 'false';
-  gameboard.placePlayerShip(mockTarget, mockPreview);
+  gameboard.placePlayerShip(50, 5, 'horizontal');
   expect(gameboard.board[50].id).toEqual(0);
   expect(gameboard.board[51].id).toEqual(0);
   expect(gameboard.board[52].id).toEqual(0);

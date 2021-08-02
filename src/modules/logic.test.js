@@ -56,41 +56,23 @@ test('Attack handler case: all ships sank', () => {
   });
 });
 
-describe('Tests using random', () => {
-  beforeEach(() => {
-    jest.spyOn(global.Math, 'random').mockReturnValue(0.4);
-  });
-  afterEach(() => {
-    jest.spyOn(global.Math, 'random').mockRestore();
-  });
+// describe('Tests using random', () => {
+//   beforeEach(() => {
+//     jest.spyOn(global.Math, 'random').mockReturnValue(0.4);
+//   });
+//   afterEach(() => {
+//     jest.spyOn(global.Math, 'random').mockRestore();
+//   });
 
-  test('Computer attacks after player makes a move', () => {
-    logic.processTurn(9);
-    expect(logic.processAttack(9, 'gameboard1')).toMatchObject({
-      action: 'hit',
-      cell: 9,
-      board: 'gameboard1',
-      allSunk: false,
-    });
-    expect(logic.data.gameboards.gameboard1.board[40]).toMatchObject({
-      isMissed: true,
-    });
-  });
-
-  test('Process turn returns an array of two objects: human and computer move feedback', () => {
-    expect(logic.processTurn(9)).toMatchObject([
-      {
-        action: 'missed',
-        cell: 9,
-        board: 'gameboard2',
-        allSunk: false,
-      },
-      {
-        action: 'missed',
-        cell: 40,
-        board: 'gameboard1',
-        allSunk: false,
-      },
-    ]);
-  });
-});
+//   test('Computer attacks after player makes a move', () => {
+//     expect(logic.processAttack(9, 'gameboard1')).toMatchObject({
+//       action: 'hit',
+//       cell: 9,
+//       board: 'gameboard1',
+//       allSunk: false,
+//     });
+//     expect(logic.data.gameboards.gameboard1.board[40]).toMatchObject({
+//       isMissed: true,
+//     });
+//   });
+// });

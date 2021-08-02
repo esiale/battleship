@@ -1,39 +1,6 @@
 import { handleShipPlacement } from './dom';
 
-// const highlightPlacement = (e) => {
-//   const cells = document.querySelectorAll('.gameboard1 .cell');
-//   const shipPreview = document.querySelector('.ship-preview');
-//   const length = +shipPreview.dataset.length;
-//   const highlightedCells = [];
-//   const cellIndex = +e.target.dataset.index;
-//   if (shipPreview.dataset.vertical === 'false') {
-//     for (let i = 0; i < length; i += 1) {
-//       highlightedCells.push(cellIndex + i);
-//     }
-//     const rightBorder = [9, 19, 29, 39, 49, 59, 69, 79, 89];
-//     const borderCell = rightBorder.filter((number) =>
-//       [number, number + 1].every((item) => highlightedCells.includes(item))
-//     );
-//     if (borderCell.length === 1) {
-//       const index = highlightedCells.indexOf(borderCell[0]) + 1;
-//       highlightedCells.splice(index);
-//     }
-//   } else if (shipPreview.dataset.vertical === 'true') {
-//     for (let i = 0; i < length; i += 1) {
-//       highlightedCells.push(cellIndex + i * 10);
-//     }
-//   }
-//   cells.forEach((cell, index) => {
-//     if (highlightedCells.includes(index) && !cell.classList.contains('ship'))
-//       cell.classList.add('highlight');
-//   });
-// };
-
-// const removeHighlightPlacement = () => {
-//   const cells = document.querySelectorAll('.gameboard1 .cell');
-//   cells.forEach((cell) => cell.classList.remove('highlight'));
-// };
-
+// eslint-disable-next-line no-unused-vars
 let ship;
 let shipIndex;
 
