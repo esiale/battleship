@@ -137,7 +137,7 @@ class Player {
         Math.floor(Math.random() * potentialTrendTargets.length)
       ];
     }
-    if (!this.attackSurroundingCells(hits, gameboard).length) {
+    if (this.attackSurroundingCells(hits, gameboard).length === 0) {
       return this.randomAttack(gameboard);
     }
   }
