@@ -56,12 +56,15 @@ describe('Tests using random', () => {
     jest.spyOn(global.Math, 'random').mockRestore();
   });
 
-  test('Computer find the best move (or at least tries)', () => {
-    logic.data.gameboards.gameboard1.addShip([44, 45]);
-    logic.data.gameboards.gameboard1.receiveAttack(44);
+  test('Computer find the best move using trends', () => {
+    logic.data.gameboards.gameboard1.addShip([44, 45, 46, 47]);
+    logic.data.gameboards.gameboard1.receiveAttack(45);
+    logic.data.gameboards.gameboard1.receiveAttack(46);
     logic.initiateComputerMove();
-    expect(logic.data.gameboards.gameboard1.board[34]).toMatchObject({
-      isMissed: true,
+    expect(logic.data.gameboards.gameboard1.board[47]).toMatchObject({
+      id: 0,
+      isHit: true,
+      part: 3,
     });
   });
 });

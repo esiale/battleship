@@ -67,8 +67,6 @@ const logic = {
 
   initiateComputerMove() {
     const playerBoard = this.data.gameboards.gameboard1;
-    // const randomMove = Player.randomAttack(playerBoard);
-    // return this.processAttack(randomMove, 'gameboard1');
     const bestMove = Player.findBestMove(playerBoard);
     return this.processAttack(bestMove, 'gameboard1');
   },
