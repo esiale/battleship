@@ -67,4 +67,13 @@ describe('Tests using random', () => {
       part: 3,
     });
   });
+
+  test('Trend test case: two hits on left border', () => {
+    logic.data.gameboards.gameboard1.addShip([40, 50, 60, 70]);
+    logic.data.gameboards.gameboard1.receiveAttack(60);
+    logic.data.gameboards.gameboard1.receiveAttack(70);
+    logic.data.gameboards.gameboard1.receiveAttack(80);
+    const hits = Player.detectShips(logic.data.gameboards.gameboard1);
+    expect(Player.detectTrends(hits)).toEqual([[], [[60, 70]]]);
+  });
 });

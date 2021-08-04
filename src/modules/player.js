@@ -1,10 +1,11 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-prototype-builtins */
 class Player {
   constructor(name) {
     this.name = name;
   }
 
-  static randomAttack(gameboard) {
+  static attackRandom(gameboard) {
     const legalAttacks = gameboard.board.reduce((cells, curr, index) => {
       if (curr !== null && curr.hasOwnProperty('isMissed')) return cells;
       if (curr === null || curr.isHit === false) cells.push(index);
@@ -32,13 +33,27 @@ class Player {
   static checkForLegalAttacks(cell, array, gameboard) {
     const rightBorder = [9, 19, 29, 39, 49, 59, 69, 79, 89];
     const leftBorder = [0, 10, 20, 30, 40, 50, 60, 70, 90];
-    if (rightBorder.some((number) => number === cell)) {
-      array.splice(array.indexOf(cell + 1), 1);
+    const referenceArray = [...array, cell];
+    if (rightBorder.includes(cell)) {
+      const illegal = referenceArray.filter((number) =>
+        rightBorder.some((item) => number === item + 1)
+      );
+      if (illegal.length !== 0) {
+        referenceArray.splice(referenceArray.indexOf(illegal[0]), 1);
+      }
     }
-    if (leftBorder.some((number) => number === cell)) {
-      array.splice(array.indexOf(cell - 1), 1);
+    if (leftBorder.includes(cell)) {
+      const illegal = referenceArray.filter((number) =>
+        leftBorder.some((item) => number === item - 1)
+      );
+      if (illegal.length !== 0) {
+        referenceArray.splice(referenceArray.indexOf(illegal[0]), 1);
+      }
     }
-    const revisedCells = array.filter((number) => number < 99 && number > 0);
+    referenceArray.splice(referenceArray.indexOf(cell), 1);
+    const revisedCells = referenceArray.filter(
+      (number) => number <= 99 && number >= 0
+    );
     const legalAttacks = revisedCells.reduce((cells, curr) => {
       if (
         gameboard.board[curr] !== null &&
@@ -72,10 +87,35 @@ class Player {
       possibleTargets.push(this.findSurroundingCells(hit, gameboard));
     });
     const flatArray = possibleTargets.flat();
+    if (flatArray.length === 0) return this.attackRandom(gameboard);
     return flatArray[Math.floor(Math.random() * flatArray.length)];
   }
 
-  static detectTrends(hits) {
+  static groupTrendsByOrientation(hits) {
+    const groupLastDigits = hits.reduce((list, current) => {
+      const last = current % 10;
+      list[last] ??= [];
+      list[last].push(current);
+      return list;
+    }, {});
+    const groupFirstDigits = hits.reduce((list, current) => {
+      let first = Math.floor(current / 10);
+      if (first === current) first = 0;
+      list[first] ??= [];
+      list[first].push(current);
+      return list;
+    }, {});
+    const getNumbers = (obj) =>
+      Object.values(obj)
+        .filter((arr) => arr.length > 1)
+        .flat();
+    const yTrend = getNumbers(groupLastDigits);
+    const xTrend = getNumbers(groupFirstDigits);
+    return [xTrend, yTrend];
+  }
+
+  static analyzeTrends(hits) {
+    const trends = this.groupTrendsByOrientation(hits);
     const analyze = (trend, item, index, array) => {
       const { getPredecessor, getSuccessor, list } = trend;
       if (getPredecessor(item) === array[index - 1]) {
@@ -93,53 +133,78 @@ class Player {
       getPredecessor: (item) => item - 10,
       getSuccessor: (item) => item + 10,
     };
-    const horizontalTrends = hits.reduce(analyze, {
+    const horizontalTrends = trends[0].reduce(analyze, {
       ...horizontalConditions,
       list: [],
     }).list;
-    const verticalTrends = hits.reduce(analyze, {
+    const verticalTrends = trends[1].reduce(analyze, {
       ...verticalConditions,
       list: [],
     }).list;
-    return [horizontalTrends, verticalTrends];
+    return { horizontalTrends, verticalTrends };
   }
 
-  static trendAttack(trends, gameboard) {
+  static attackTrend(horizontalTrends, verticalTrends, gameboard) {
     const potentialTargets = [];
-    if (trends[0].length) {
-      trends[0].forEach((item) => {
+    if (horizontalTrends.length !== 0) {
+      horizontalTrends.forEach((item) => {
         const highest = Math.max(...item);
         const lowest = Math.min(...item);
-        potentialTargets.push(highest + 1, lowest - 1);
+        if (
+          this.checkForLegalAttacks(highest, [highest + 1], gameboard)
+            .length !== 0
+        )
+          potentialTargets.push(highest + 1);
+        if (
+          this.checkForLegalAttacks(lowest, [lowest - 1], gameboard).length !==
+          0
+        )
+          potentialTargets.push(lowest - 1);
       });
     }
-    if (trends[1].length) {
-      trends[1].forEach((item) => {
+    if (verticalTrends.length !== 0) {
+      verticalTrends.forEach((item) => {
         const highest = Math.max(...item);
         const lowest = Math.min(...item);
-        potentialTargets.push(highest + 10, lowest - 10);
+        if (
+          this.checkForLegalAttacks(highest, [highest + 10], gameboard)
+            .length !== 0
+        )
+          potentialTargets.push(highest + 10);
+        if (
+          this.checkForLegalAttacks(lowest, [lowest - 10], gameboard).length !==
+          0
+        )
+          potentialTargets.push(lowest - 10);
       });
     }
-    potentialTargets.forEach((target) => {
-      this.checkForLegalAttacks(target, potentialTargets, gameboard);
-    });
-    if (potentialTargets.length) return potentialTargets;
-    return this.attackSurroundingCells(this.detectShips(gameboard), gameboard);
+    if (potentialTargets.length) {
+      const removeDuplicates = [...new Set(potentialTargets)];
+      return removeDuplicates;
+    }
+    return null;
   }
 
   static findBestMove(gameboard) {
     const hits = this.detectShips(gameboard);
-    if (hits.length === 0) return this.randomAttack(gameboard);
-    const trends = this.detectTrends(hits);
-    if (trends[0].length || trends[1].length) {
-      const potentialTrendTargets = this.trendAttack(trends, gameboard);
-      return potentialTrendTargets[
-        Math.floor(Math.random() * potentialTrendTargets.length)
-      ];
+    if (hits.length === 0) return this.attackRandom(gameboard);
+    if (hits.length >= 2) {
+      const { horizontalTrends, verticalTrends } = this.analyzeTrends(hits);
+      if (horizontalTrends.length || verticalTrends.length) {
+        const potentialTrendTargets = this.attackTrend(
+          horizontalTrends,
+          verticalTrends,
+          gameboard
+        );
+        if (potentialTrendTargets === null) {
+          return this.attackSurroundingCells(hits, gameboard);
+        }
+        return potentialTrendTargets[
+          Math.floor(Math.random() * potentialTrendTargets.length)
+        ];
+      }
     }
-    if (this.attackSurroundingCells(hits, gameboard).length === 0) {
-      return this.randomAttack(gameboard);
-    }
+    return this.attackSurroundingCells(hits, gameboard);
   }
 }
 

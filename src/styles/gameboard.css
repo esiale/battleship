@@ -2,8 +2,8 @@
 .gameboard2 {
   outline: 0.1rem black solid;
   display: grid;
-  width: 25rem;
-  height: 25rem;
+  width: 27rem;
+  height: 27rem;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
   margin: 1rem;
