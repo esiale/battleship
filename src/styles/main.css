@@ -29,6 +29,7 @@ a:active {
 }
 
 body {
+  background-color: var(--background);
   height: 100vh;
   width: 100vw;
   margin: 0;
@@ -38,7 +39,6 @@ body {
 }
 
 .wrapper {
-  background-color: var(--background);
   height: 100%;
   width: 100%;
   display: grid;

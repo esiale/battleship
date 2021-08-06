@@ -11,7 +11,8 @@ _for The Odin Project_
 ## Features:
 
 This is a simple Battleship game where you take turns with the computer.
-This project features drag-and-drop functionality for player ship placement.
+
+This project features drag-and-drop functionality for player ship placement. Unfortunately, at this moment the game is unplayable on mobile phones due to the drag events not being supported.
 
 The AI doesn't cheat but isn't too smart either.
 
