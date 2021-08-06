@@ -32,19 +32,14 @@ const dragndrop = {
 
   handleDragEnter(e) {
     e.preventDefault();
-    // highlightPlacement(e);
   },
 
   handleDragOver(e) {
     e.preventDefault();
-    // highlightPlacement(e);
   },
 
   handleDragLeave(e) {
     e.preventDefault();
-    // setTimeout(() => {
-    //   removeHighlightPlacement(e);
-    // }, 10);
   },
 
   handleDragEnd() {
@@ -53,7 +48,6 @@ const dragndrop = {
   },
 
   handleDrop(e) {
-    // removeHighlightPlacement(e);
     const { orientation } = document.querySelector('.ship-container').dataset;
     const cell = e.target;
     if (orientation === 'horizontal') {

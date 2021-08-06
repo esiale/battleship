@@ -1,16 +1,13 @@
+/* eslint-disable consistent-return */
 /* eslint-disable no-prototype-builtins */
+import cross from '../img/x.svg';
 import { logic } from './logic';
 
-const concludeGame = (player) => {
-  alert(`${player} has lost!`);
-};
-
-const updateBoard = (action, target, board) => {
+const updateBoard = (action, target, board, allSunk) => {
   const gameboard = document.querySelector(`.${board}`);
   const cell = gameboard.querySelector(`[data-index='${target}']`);
   switch (action) {
     case 'hit':
-      cell.classList.remove('ship');
       cell.classList.add('hit');
       break;
     case 'missed':
@@ -19,12 +16,17 @@ const updateBoard = (action, target, board) => {
     case 'sunk':
       target.forEach((item) => {
         const sunkCell = gameboard.querySelector(`[data-index='${item}']`);
-        sunkCell.classList.remove('hit');
         sunkCell.classList.add('sunk');
+        const xIcon = new Image();
+        xIcon.src = cross;
+        xIcon.className = 'sunk-x';
+        sunkCell.append(xIcon);
       });
       break;
     default:
   }
+  // eslint-disable-next-line no-use-before-define
+  if (allSunk === true) return concludeGame(board);
 };
 
 const initiateAttack = (e) => {
@@ -36,12 +38,15 @@ const initiateAttack = (e) => {
   cells.forEach((item) => {
     item.removeEventListener('click', initiateAttack);
   });
+  // eslint-disable-next-line no-use-before-define
+  if (feedback.allSunk === true) return concludeGame(feedback.board);
   const computerFeedback = logic.initiateComputerMove();
   setTimeout(() => {
     updateBoard(
       computerFeedback.action,
       computerFeedback.cell,
-      computerFeedback.board
+      computerFeedback.board,
+      computerFeedback.allSunk
     );
     cells.forEach((item) => {
       if (
@@ -71,7 +76,6 @@ const renderBoard = (gameboard) => {
     const newCell = document.createElement('div');
     newCell.className = 'cell';
     newCell.dataset.index = i;
-    newCell.textContent = i;
     board.append(newCell);
   }
   const wrapper = document.querySelector('.boards-wrapper');
@@ -102,16 +106,33 @@ const rotateShip = () => {
   }
 };
 
-const resetShips = () => {
-  const gameboard = logic.data.gameboards.gameboard1;
-  gameboard.ships = [];
-  gameboard.board.forEach((item, index) => {
-    if (item !== null) gameboard.board[index] = null;
-  });
-  const cells = document.querySelectorAll('.gameboard1 .cell');
+const reset = () => {
+  logic.resetLogic();
+  const cells = document.querySelectorAll('.boards-wrapper .cell');
   cells.forEach((item) => {
     if (item.classList.contains('ship')) item.classList.remove('ship');
+    if (item.classList.contains('hit')) item.classList.remove('hit');
+    if (item.classList.contains('missed')) item.classList.remove('missed');
+    if (item.classList.contains('sunk')) {
+      item.classList.remove('sunk');
+      item.removeChild(item.lastChild);
+    }
   });
+  const shipDrag = document.querySelector('.ship-drag');
+  shipDrag.classList.remove('remove');
+  const instructions = document.querySelector('.instructions');
+  instructions.classList.remove('remove');
+  const legend = document.querySelector('.legend');
+  legend.classList.add('remove');
+  const rotateButton = document.querySelector('.rotate-btn');
+  rotateButton.classList.remove('remove');
+  const legendButton = document.querySelector('.legend-btn');
+  legendButton.classList.add('remove');
+  const resetButton = document.querySelector('.reset-btn');
+  resetButton.textContent = 'Reset';
+  const sidePanel = document.querySelector('.side-panel');
+  if (sidePanel.classList.contains('collapse'))
+    sidePanel.classList.remove('collapse');
   const shipContainer = document.querySelector('.ship-container');
   while (shipContainer.firstChild) {
     shipContainer.firstChild.remove();
@@ -120,14 +141,21 @@ const resetShips = () => {
 };
 
 const prepareStart = () => {
-  const shipContainer = document.querySelector('.ship-container');
-  shipContainer.className = 'ship-container-hidden';
-  const buttons = document.querySelector('.buttons');
-  buttons.className = 'buttons-hidden';
+  const shipDrag = document.querySelector('.ship-drag');
+  shipDrag.classList.add('remove');
+  const rotateButton = document.querySelector('.rotate-btn');
+  rotateButton.classList.add('remove');
+  const legendButton = document.querySelector('.legend-btn');
+  legendButton.classList.remove('remove');
+  const instructions = document.querySelector('.instructions');
+  instructions.classList.add('remove');
+  const sidePanel = document.querySelector('.side-panel');
+  sidePanel.classList.add('collapse');
   const computerCells = document.querySelectorAll('.gameboard2 .cell');
   computerCells.forEach((item) => {
     item.addEventListener('click', initiateAttack);
   });
+  logic.placeComputerShips();
 };
 
 const nextShip = () => {
@@ -162,20 +190,49 @@ const handleShipPlacement = (cell) => {
   }
 };
 
+const displayLegend = () => {
+  const legend = document.querySelector('.legend');
+  const sidePanel = document.querySelector('.side-panel');
+  if (legend.classList.contains('remove')) {
+    legend.classList.remove('remove');
+    sidePanel.classList.remove('collapse');
+  } else {
+    legend.classList.add('remove');
+    sidePanel.classList.add('collapse');
+  }
+};
+
 const applyListeners = () => {
   const rotateButton = document.querySelector('.rotate-btn');
   rotateButton.addEventListener('click', rotateShip);
   const resetButton = document.querySelector('.reset-btn');
-  resetButton.addEventListener('click', resetShips);
+  resetButton.addEventListener('click', reset);
+  const legendButton = document.querySelector('.legend-btn');
+  legendButton.addEventListener('click', displayLegend);
 };
 
 const renderAll = () => {
   renderBoard(logic.data.gameboards.gameboard1);
   renderBoard(logic.data.gameboards.gameboard2);
   renderDragShip('carrier', 5);
-  // FOR STYLING - REMOVE BEFORE PUBLISHING //
-  drawShips(logic.data.gameboards.gameboard2);
   applyListeners();
 };
 
-export { renderAll, resetShips, handleShipPlacement };
+function concludeGame(gameboard) {
+  let winner;
+  if (gameboard === 'gameboard1') {
+    winner = 'Computer';
+  } else {
+    winner = 'You';
+  }
+  const message = document.querySelector('.message');
+  message.textContent = `${winner} won! Click the button on the side panel to play again.`;
+  const resetButton = document.querySelector('.reset-btn');
+  resetButton.textContent = 'Play again!';
+  const computerCells = document.querySelectorAll('.gameboard2 .cell');
+  computerCells.forEach((item) => {
+    item.removeEventListener('click', initiateAttack);
+  });
+}
+
+export { renderAll, handleShipPlacement };

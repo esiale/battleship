@@ -22,7 +22,7 @@ const logic = {
     gameboard.addShip(gameboard.findRandomShipLocation(5), 5);
     gameboard.addShip(gameboard.findRandomShipLocation(4), 4);
     gameboard.addShip(gameboard.findRandomShipLocation(3), 3);
-    gameboard.addShip(gameboard.findRandomShipLocation(2), 2);
+    gameboard.addShip(gameboard.findRandomShipLocation(3), 3);
     gameboard.addShip(gameboard.findRandomShipLocation(2), 2);
   },
 
@@ -69,6 +69,18 @@ const logic = {
     const playerBoard = this.data.gameboards.gameboard1;
     const bestMove = Player.findBestMove(playerBoard);
     return this.processAttack(bestMove, 'gameboard1');
+  },
+
+  resetLogic() {
+    const { gameboard1, gameboard2 } = this.data.gameboards;
+    gameboard1.ships = [];
+    gameboard1.board.forEach((item, index) => {
+      if (item !== null) gameboard1.board[index] = null;
+    });
+    gameboard2.ships = [];
+    gameboard2.board.forEach((item, index) => {
+      if (item !== null) gameboard2.board[index] = null;
+    });
   },
 };
 

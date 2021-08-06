@@ -1,53 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Contrail+One&family=Roboto&display=swap');
+
+:root {
+  --background: hsl(240, 20%, 80%);
+  --primary: hsl(240, 20%, 50%);
+  --secondary: hsl(240, 22%, 20%);
+  --side: hsl(240, 20%, 60%);
+  --outline: hsl(240, 20%, 30%);
+  --hit: hsl(12, 100%, 35%);
+  --sunk: hsl(12, 100%, 20%);
+  --brighttext: hsl(240, 22%, 85%);
+}
+
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a,
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;
+  color: inherit;
+}
+
 body {
   height: 100vh;
   width: 100vw;
   margin: 0;
   padding: 0;
+  color: var(--secondary);
+  font-family: 'Roboto', sans-serif;
 }
 
 .wrapper {
+  background-color: var(--background);
   height: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template:
+    '. top'
+    'side boards';
+  justify-items: center;
   justify-content: center;
-  align-items: center;
-}
-
-.boards-wrapper {
-  display: flex;
-  flex-direction: row;
-  max-height: 100%;
-  max-width: 100%;
 }
 
 .top {
-  width: 100%;
-  height: 16vh;
+  grid-area: top;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
+  flex-direction: column;
+  padding-bottom: 1rem;
 }
 
 .top-header {
-  font-size: 2.5rem;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  font-size: 3rem;
+  font-family: 'Contrail One', cursive;
 }
 
-.top-panel {
+.message {
+  height: 1.5rem;
+}
+
+.side-panel {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  grid-area: side;
+  height: 20rem;
+  width: 15rem;
+  margin-top: 2.5rem;
+  background-color: var(--side);
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+}
+
+.collapse {
+  height: 6rem;
+}
+
+.side-footer {
+  margin-top: auto;
+  margin-bottom: 0.2rem;
+}
+
+.side-footer a {
+  font-weight: 600;
+}
+
+.instructions {
+  margin-bottom: 0.3rem;
+}
+
+.legend {
+  display: flex;
   height: 100%;
+}
+
+.legend-icons {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
+.legend-icons div {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0.3rem 0;
+}
+
+.legend-desc {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.3rem;
+  margin-left: 1rem;
 }
 
 .ship-drag {
   display: flex;
   justify-content: center;
+  margin-top: auto;
 }
 
 .ship-container {
@@ -58,6 +138,10 @@ body {
   visibility: hidden;
 }
 
+.remove {
+  display: none;
+}
+
 .carrier,
 .battleship,
 .submarine,
@@ -65,19 +149,150 @@ body {
 .destroyer {
   width: 2.5rem;
   height: 2.5rem;
-  background-color: red;
-  border: 0.1rem black solid;
+  background-color: var(--secondary);
+  border: 0.2rem var(--outline) ridge;
+  border-radius: 0.2rem;
+  outline: 0.1rem var(--primary) solid;
 }
 
 .buttons {
   display: flex;
   justify-content: center;
+  width: 100%;
 }
 
-.ship-container-hidden {
-  display: none;
+.buttons button {
+  background-color: var(--outline);
+  color: var(--brighttext);
+  border-radius: 0.2rem;
+  border: 0.1rem var(--outline) outset;
+  padding: 0.4rem;
+  margin: 0.4rem;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9rem;
+  width: 40%;
 }
 
-.buttons-hidden {
-  display: none;
+.reset-btn {
+  order: 1;
+}
+
+.boards-wrapper {
+  grid-area: boards;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template:
+    'title1 title2'
+    'board1 board2';
+  justify-items: center;
+  align-self: start;
+}
+
+.gameboard1-title,
+.gameboard2-title {
+  align-self: end;
+  font-size: 1.5rem;
+  font-family: 'Contrail One', cursive;
+}
+
+.gameboard1-title {
+  grid-area: title1;
+}
+.gameboard2-title {
+  grid-area: title2;
+}
+
+.gameboard1 {
+  grid-area: board1;
+}
+
+.gameboard2 {
+  grid-area: board2;
+}
+
+.gameboard1,
+.gameboard2 {
+  display: grid;
+  outline: 0.2rem var(--outline) solid;
+  width: 27rem;
+  height: 27rem;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  margin: 1rem;
+}
+
+.cell {
+  outline: 0.1rem var(--primary) solid;
+}
+
+.ship,
+.hit,
+.sunk {
+  border: 0.2rem var(--outline) ridge;
+  border-radius: 0.2rem;
+}
+
+.ship {
+  background-color: var(--secondary);
+}
+
+.hit {
+  background-color: var(--hit);
+}
+
+.missed {
+  background-color: gray;
+  border: 0.1rem var(--outline) ridge;
+}
+
+.sunk {
+  background-color: var(--sunk);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sunk-x {
+  width: 3rem;
+  height: 3rem;
+}
+
+@media only screen and (max-width: 1200px) {
+  .boards-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template:
+      'title1'
+      'board1'
+      'title2'
+      'board2';
+  }
+}
+
+@media only screen and (max-width: 710px) {
+  .wrapper {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template:
+      'side top'
+      'boards boards';
+  }
+  .top {
+    justify-content: flex-start;
+    margin-top: 2.5rem;
+  }
+  .boards-wrapper {
+    margin-top: 1rem;
+  }
+}
+
+@media only screen and (max-width: 450px) {
+  html {
+    font-size: 11px;
+  }
+  .message {
+    width: 9rem;
+  }
 }

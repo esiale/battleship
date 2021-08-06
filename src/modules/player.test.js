@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable import/no-named-as-default-member */
 /* eslint-disable import/no-named-as-default */
 import Player from './player';
@@ -74,6 +75,9 @@ describe('Tests using random', () => {
     logic.data.gameboards.gameboard1.receiveAttack(70);
     logic.data.gameboards.gameboard1.receiveAttack(80);
     const hits = Player.detectShips(logic.data.gameboards.gameboard1);
-    expect(Player.detectTrends(hits)).toEqual([[], [[60, 70]]]);
+    expect(Player.analyzeTrends(hits)).toEqual({
+      horizontalTrends: [],
+      verticalTrends: [[60, 70]],
+    });
   });
 });

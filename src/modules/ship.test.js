@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import Ship from './ship';
 
 test('Ship stores hit locations', () => {
