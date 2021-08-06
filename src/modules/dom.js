@@ -1,9 +1,10 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
 /* eslint-disable no-prototype-builtins */
 import cross from '../img/x.svg';
 import { logic } from './logic';
 
-const updateBoard = (action, target, board, allSunk) => {
+const updateBoard = (action, target, board) => {
   const gameboard = document.querySelector(`.${board}`);
   const cell = gameboard.querySelector(`[data-index='${target}']`);
   switch (action) {
@@ -25,8 +26,6 @@ const updateBoard = (action, target, board, allSunk) => {
       break;
     default:
   }
-  // eslint-disable-next-line no-use-before-define
-  if (allSunk === true) return concludeGame(board);
 };
 
 const initiateAttack = (e) => {
@@ -38,8 +37,7 @@ const initiateAttack = (e) => {
   cells.forEach((item) => {
     item.removeEventListener('click', initiateAttack);
   });
-  // eslint-disable-next-line no-use-before-define
-  if (feedback.allSunk === true) return concludeGame(feedback.board);
+  if (feedback.allSunk === true) return concludeGame('You');
   const computerFeedback = logic.initiateComputerMove();
   setTimeout(() => {
     updateBoard(
@@ -48,6 +46,7 @@ const initiateAttack = (e) => {
       computerFeedback.board,
       computerFeedback.allSunk
     );
+    if (computerFeedback.allSunk === true) return concludeGame('Computer');
     cells.forEach((item) => {
       if (
         !item.classList.contains('hit') &&
@@ -138,6 +137,8 @@ const reset = () => {
     shipContainer.firstChild.remove();
   }
   renderDragShip('carrier', 5);
+  const message = document.querySelector('.message');
+  message.textContent = '';
 };
 
 const prepareStart = () => {
@@ -218,15 +219,9 @@ const renderAll = () => {
   applyListeners();
 };
 
-function concludeGame(gameboard) {
-  let winner;
-  if (gameboard === 'gameboard1') {
-    winner = 'Computer';
-  } else {
-    winner = 'You';
-  }
+function concludeGame(player) {
   const message = document.querySelector('.message');
-  message.textContent = `${winner} won! Click the button on the side panel to play again.`;
+  message.textContent = `${player} won! Click the button on the side panel to play again.`;
   const resetButton = document.querySelector('.reset-btn');
   resetButton.textContent = 'Play again!';
   const computerCells = document.querySelectorAll('.gameboard2 .cell');
