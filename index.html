@@ -10,22 +10,44 @@
     <div class="wrapper">
       <div class="top">
         <div class="top-header">Battleship</div>
-        <div class="top-panel">
-          <div class="message">Drag & drop the ship:</div>
-          <div class="ship-drag">
-            <div
-              class="ship-container"
-              draggable="true"
-              data-orientation="horizontal"
-            ></div>
+        <div class="message">Lorem ipsum dolor sit amet.</div>
+      </div>
+      <div class="side-panel">
+        <div class="buttons">
+          <button class="rotate-btn">Horizontal</button
+          ><button class="reset-btn">Reset</button>
+          <button class="legend-btn remove">Legend</button>
+        </div>
+        <div class="instructions">Drag & drop the ship:</div>
+        <div class="legend remove">
+          <div class="legend-icons">
+            <div class="cell ship"></div>
+            <div class="cell missed"></div>
+            <div class="cell ship hit"></div>
+            <div class="cell ship sunk"><img src="/img/x.svg" /></div>
           </div>
-          <div class="buttons">
-            <button class="rotate-btn">Horizontal</button
-            ><button class="reset-btn">Reset</button>
+          <div class="legend-desc">
+            <p>- your ship</p>
+            <p>- a missed shot</p>
+            <p>- ship's been hit!</p>
+            <p>- a sunk ship</p>
           </div>
         </div>
+        <div class="ship-drag">
+          <div
+            class="ship-container"
+            draggable="true"
+            data-orientation="horizontal"
+          ></div>
+        </div>
+        <div class="side-footer">
+          <a href="https://github.com/esiale">esiale</a> for The Odin Project
+        </div>
       </div>
-      <div class="boards-wrapper"></div>
+      <div class="boards-wrapper">
+        <div class="gameboard1-title">Your board</div>
+        <div class="gameboard2-title">Computer's board</div>
+      </div>
     </div>
     <script src="main.js"></script>
   </body>
